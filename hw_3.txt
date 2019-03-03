@@ -1,0 +1,74 @@
+INSERT INTO `countries` 
+(`title`) VALUES 
+('Россия'),
+('США'),
+('Аргентина'),
+('ЮАР');
+
+INSERT INTO `regions` 
+(`country_id`, `title`) VALUES 
+(1, 'Московская'),
+(2, 'Юта'),
+(1, 'Воронежская'),
+(1, 'Волгоградская');
+
+INSERT INTO `cities` 
+(`country_id`, `important`, `region_id`, `title`) VALUES 
+(1, 1, 1, 'Химки'),
+(1, 1, 1, 'Клин'),
+(1, 1, 4, 'Волгоград'),
+(1, 1, 3, 'Воронеж'),
+(2, 1, 2, 'Солт-Лейк-Сити');
+
+SELECT * FROM `cities`;
+
+SELECT * FROM `cities` where `region_id` = 1;
+
+CREATE SCHEMA IF NOT EXISTS `workers` CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+use `workers`;
+
+CREATE TABLE `depart` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(40) NOT NULL,
+`count` INT DEFAULT 0,
+`head_id` INT
+);
+
+CREATE TABLE IF NOT EXISTS `shtat` (
+`id` INT NOT NULL AUTO_INCREMENT,
+`name` VARCHAR(25) NOT NULL,
+`lastname` VARCHAR(25) NOT NULL,
+`dept` INT,
+`position` VARCHAR(30),
+`salary` INT,
+PRIMARY KEY (`id`)
+)DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+INSERT INTO `depart` 
+(`name`) VALUES 
+('Бухгалтерия'),
+('Охрана'),
+('Контроль качества'),
+('Реклама');
+
+INSERT INTO `shtat` 
+(`name`,`lastname`,`dept`,`salary`) VALUES 
+('Тарас','Голомозый',1,25000),
+('Антон','Полонников',14,35000),
+('Алена','Звягинцева',1,45000),
+('Владимир','Питерский',1,40000),
+('Анатолий','Башлыков',2,30000),
+('Ирина','Кенина',2,50000);
+
+SELECT `dept`, AVG(`salary`) FROM `shtat` GROUP BY `dept`;
+SELECT * FROM `shtat` ORDER BY `salary` DESC LIMIT 1;
+DELETE * FROM `shtat` ORDER BY `salary` DESC LIMIT 1;
+SELECT `dept`, count(*) FROM `shtat` GROUP BY `dept`;
+SELECT `dept`, count(*), sum(`salary`) FROM `shtat` GROUP BY `dept`;
+
+
+
+
+
+
+

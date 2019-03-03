@@ -1,0 +1,34 @@
+CREATE VIEW `avg_salary` AS SELECT AVG(`salary`) AS `сред зп`,`depart`.`name` FROM `shtat` 
+LEFT JOIN `depart`
+ON `depart`.`id` = `shtat`.`dept`
+GROUP BY `depart`.`name`;
+
+SELECT * FROM `avg_salary`;
+
+CREATE FUNCTION `manager_find` (name_m VARCHAR(25), lastname_m VARCHAR(25))
+RETURNS INT DETERMINISTIC
+READS SQL DATA
+RETURN (SELECT `id` FROM `shtat` WHERE `name` = name_m AND`lastname` = lastname_m);
+
+SELECT `manager_find`('Тарас', 'Голомозый');
+
+CREATE TABLE IF NOT EXISTS `salary` (
+`id` INT NOT NULL AUTO_INCREMENT,
+`shtat_id` INT NOT NULL,
+`date` DATE, 
+`salary` INT,
+PRIMARY KEY (`id`)
+)DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TRIGGER `new_shtat`
+AFTER INSERT ON `shtat`
+FOR EACH ROW
+INSERT INTO `salary` (`shtat_id`, `date`, `size`) VALUES (NEW.id, CURDATE(), 700);
+
+INSERT INTO `shtat` 
+(`name`,`lastname`,`dept`,`salary`) VALUES 
+('Антон','Полонников',2,35000),
+('Алена','Звягинцева',1,45000),
+('Владимир','Питерский',1,40000),
+('Анатолий','Башлыков',2,30000),
+('Ирина','Кенина',2,50000);

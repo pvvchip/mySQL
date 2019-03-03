@@ -1,0 +1,44 @@
+CREATE SCHEMA IF NOT EXISTS `geodata` CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `lesson_1_hw_country`;
+CREATE TABLE geodata.countries AS SELECT * FROM lesson_1_hw_country.country;
+CREATE TABLE geodata.regions AS SELECT * FROM lesson_1_hw_country.area;
+CREATE TABLE geodata.cities AS SELECT * FROM lesson_1_hw_country.city;
+
+USE `geodata`;
+ALTER TABLE `countries` CHANGE `name` `title` VARCHAR(150);
+CREATE INDEX `title` ON `countries` (`title`);
+ALTER TABLE `countries` ADD PRIMARY KEY(`id`);
+ALTER TABLE `countries` MODIFY COLUMN `id` INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE `countries` MODIFY COLUMN `title` VARCHAR(150) NOT NULL;
+
+ALTER TABLE `regions` CHANGE `name` `title` VARCHAR(150);
+ALTER TABLE `regions` ADD PRIMARY KEY (`id`);
+ALTER TABLE `regions` MODIFY COLUMN `id` INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE `regions`
+	ADD CONSTRAINT `countrys` FOREIGN KEY (`country_id`)
+	REFERENCES `countries`(`id`)
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT;
+ALTER TABLE `regions` MODIFY COLUMN `title` VARCHAR(150) NOT NULL;
+
+ALTER TABLE `cities` ADD PRIMARY KEY(`id`);
+ALTER TABLE `cities` MODIFY COLUMN `id` INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE `cities`
+	ADD CONSTRAINT `country` FOREIGN KEY (`country_id`)
+	REFERENCES `countries`(`id`)
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT;
+ALTER TABLE `cities` CHANGE COLUMN `area_id` `important` TINYINT(1) NOT NULL;
+
+ALTER TABLE `cities`
+	ADD CONSTRAINT `region` FOREIGN KEY (`region_id`)
+	REFERENCES `regions` (`id`)
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT;
+
+ALTER TABLE `cities` MODIFY COLUMN `region_id` INT NOT NULL;
+ALTER TABLE `cities` CHANGE COLUMN `name` `title` VARCHAR(150) NOT NULL;
+CREATE INDEX `title` ON `cities`(`title`);
+
+
+
