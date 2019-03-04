@@ -1,0 +1,45 @@
+SHOW VARIABLES LIKE 'autocomit';
+
+SET AUTOCOMMIT = 0;
+
+SHOW VARIABLES LIKE 'transaction_isolation';
+
+SET transaction_isolation = SERIALIZABLE;
+
+BEGIN;
+INSERT INTO `salary` (`shtat_id`, `date`, `size`) SELECT `id`, curdate(), 20000 FROM `shtat` ORDER BY `salary` DESC LIMIT 3;
+COMMIT;
+
+mysql> EXPLAIN
+    -> SELECT `id`, curdate(), 20000 FROM `shtat` ORDER BY `salary` DESC LIMIT 3;
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
+|  1 | SIMPLE      | shtat | NULL       | ALL  | NULL          | NULL | NULL    | NULL |   11 |   100.00 | Using filesort |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
+1 row in set, 1 warning (0,00 sec)
+
+mysql> EXPLAIN
+    -> SELECT `dept`, AVG(`salary`) FROM `shtat` GROUP BY `dept`;
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-----------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra           |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-----------------+
+|  1 | SIMPLE      | shtat | NULL       | ALL  | NULL          | NULL | NULL    | NULL |   11 |   100.00 | Using temporary |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-----------------+
+1 row in set, 1 warning (0,00 sec)
+
+mysql> EXPLAIN
+    -> SELECT `shtat`.`name`, `shtat`.`lastname`, `shtat`.`salary`, `depart`.`name`, `salary`.`date` FROM `shtat`
+    -> LEFT JOIN `depart`
+    -> ON `depart`.`id` = `shtat`.`dept`
+    -> LEFT JOIN `salary`
+    -> ON `salary`.`shtat_id` = `shtat`.`id`;
++----+-------------+--------+------------+--------+---------------+---------+---------+--------------------+------+----------+----------------------------------------------------+
+| id | select_type | table  | partitions | type   | possible_keys | key     | key_len | ref                | rows | filtered | Extra                                              |
++----+-------------+--------+------------+--------+---------------+---------+---------+--------------------+------+----------+----------------------------------------------------+
+|  1 | SIMPLE      | shtat  | NULL       | ALL    | NULL          | NULL    | NULL    | NULL               |   11 |   100.00 | NULL                                               |
+|  1 | SIMPLE      | depart | NULL       | eq_ref | PRIMARY       | PRIMARY | 4       | workers.shtat.dept |    1 |   100.00 | NULL                                               |
+|  1 | SIMPLE      | salary | NULL       | ALL    | NULL          | NULL    | NULL    | NULL               |   12 |   100.00 | Using where; Using join buffer (Block Nested Loop) |
++----+-------------+--------+------------+--------+---------------+---------+---------+--------------------+------+----------+----------------------------------------------------+
+3 rows in set, 1 warning (0,00 sec)
+
