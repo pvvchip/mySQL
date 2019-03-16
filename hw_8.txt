@@ -1,0 +1,66 @@
+--- PostgreSQL ---
+root@MySQL8:~# createdb geodata
+
+root@MySQL8:~# psql geodata
+psql (11.1 (Debian 11.1-1.pgdg90+1))
+
+CREATE TABLE countries (
+country_code char(2) PRIMARY KEY,
+country_name text UNIQUE);
+
+INSERT INTO countries (country_code, country_name) VALUES
+('ru', 'Russia'),
+('us', 'United States'),
+('au', 'Australia');
+
+geodata=# SELECT * FROM countries;
+ country_code | country_name  
+--------------+---------------
+ ru           | Russia
+ us           | United States
+ au           | Australia
+(3 строки)
+
+CREATE TABLE cites(
+	name text NOT NULL,
+	country_code char(2) REFERENCES countries,
+	PRIMARY KEY (name, country_code)
+);
+
+INSERT INTO cites (name, country_code) VALUES
+('Moscow', 'ru'),
+('Piterburg', 'ru'),
+('Moscow', 'us');
+
+geodata=# SELECT * FROM cites;
+   name    | country_code 
+-----------+--------------
+ Moscow    | ru
+ Piterburg | ru
+ Moscow    | us
+(3 строки)
+
+--- Redis ---
+root@MySQL8:~# redis-cli 
+
+127.0.0.1:6379> MSET user:maris:name 'Maris Dol' user:maris:password '321'
+OK
+127.0.0.1:6379> MSET user:piter:name 'Piter Mors' user:piter:password '123'
+OK
+127.0.0.1:6379> MGET user:piter:name
+1) "Piter Mors"
+127.0.0.1:6379> MGET user:piter:password
+1) "123"
+127.0.0.1:6379> MGET user:maris:password
+1) "321"
+127.0.0.1:6379> 
+
+127.0.0.1:6379> HMSET user name 'Jon Test' password '123123'
+OK
+127.0.0.1:6379> HVALS user
+1) "Jon Test"
+2) "123123"
+127.0.0.1:6379> HKEYS user
+1) "name"
+2) "password"
+
